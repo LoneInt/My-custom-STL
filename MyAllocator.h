@@ -50,12 +50,21 @@ namespace MySTL {
 			return _allocate((ptrdiff_t)n, (pointer) hint);
 		}
 
+		pointer fill_init(T* _first, size_t n);
+
 		void deallocate(pointer p, size_t n) { _deallocate(p); }
 	
 		void construct(pointer p, const T& value) { _construct(p, value); }
 
 		void destroy(pointer p) {
 			_destroy(p);
+		}
+
+		void destroy(pointer start, pointer end) {
+			pointer p = start;
+			for (; p != end; p++) {
+				destroy(p);
+			}
 		}
 
 		pointer address(reference x) {
@@ -70,7 +79,46 @@ namespace MySTL {
 			return size_t(UINT_MAX / sizeof(T));
 		}
 	};
+
+	template<class T>
+	allocator<T>::pointer allocator<T>::fill_init(T* _first, size_t n) {
+		T* p = _first;
+		T init = T();
+		for (int i = 0; i < n; i++) {
+			*(p + i) = init;	//The definition of T should provide copy constructor.
+		}
+		return p;
+	}
+	//traits
+	template<>
+	allocator<int>::pointer allocator<int>::fill_init(int* _first, size_t n) {
+		pointer p = _first;
+		for (int i = 0; i < n; i++) {
+			*(p + i) = 0;
+		}
+		return p;
+	}
+
+	template<>
+	allocator<double>::pointer allocator<double>::fill_init(double* _first, size_t n) {
+		pointer p = _first;
+		for (int i = 0; i < n; i++) {
+			*(p + i) = 0;
+		}
+		return p;
+	}
+
+	template<>
+	allocator<float>::pointer allocator<float>::fill_init(float* _first, size_t n) {
+		pointer p = _first;
+		for (int i = 0; i < n; i++) {
+			*(p + i) = 0;
+		}
+		return p;
+	}
 }	//End of namespace MySTL
+
+
 
 
 #endif
